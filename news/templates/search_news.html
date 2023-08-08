@@ -1,0 +1,30 @@
+
+{% extends 'flatpages/default.html' %}
+
+{% block content %}
+<h1>Поиск новостей</h1>
+<form action="{% url 'news:search_results' %}" method="get">
+    <label for="search_title">По названию:</label>
+    <input type="text" id="search_title" name="title">
+    <br>
+    <label for="search_author">По имени автора:</label>
+    <input type="text" id="search_author" name="author">
+    <br>
+    <label for="search_date">Позже какой даты:</label>
+    <input type="date" id="search_date" name="date">
+    <br>
+    <button type="submit">Искать</button>
+</form>
+
+<h2>Результаты поиска:</h2>
+{% for news in news_list %}
+    <div>
+        <h3>{{ news.title }}</h3>
+        <p>Автор: {{ news.author.username }}</p>
+        <p>Дата публикации: {{ news.pub_date }}</p>
+        <p>{{ news.text }}</p>
+    </div>
+{% empty %}
+    <p>По вашему запросу ничего не найдено.</p>
+{% endfor %}
+{% endblock %}
