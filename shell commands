@@ -1,0 +1,57 @@
+# Создаем пользователей
+User.objects.create_user(username='Bob')
+User.objects.create_user(username='Alice')
+User.objects.create_user(username='John')
+User.objects.create_user(username='Megan')
+
+# Создаем авторов, связанных с пользователями
+Author.objects.create(author=User.objects.get(username='Bob'))
+Author.objects.create(author=User.objects.get(username='Alice'))
+
+# Добавляем категории
+Category.objects.create(category_name='Fantasy')
+Category.objects.create(category_name='Sci-Fi')
+Category.objects.create(category_name='Mystery')
+Category.objects.create(category_name='Romance')
+
+# Добавляем статьи и новости
+Post.objects.create(post_author=Author.objects.get(author__username='Bob'), news_title='Fantastic worlds', news_text='A journey into fantasy realms', news_type_choice='ar')
+Post.objects.create(post_author=Author.objects.get(author__username='Alice'), news_title='Into the future', news_text='Predictions and possibilities', news_type_choice='ar')
+Post.objects.create(post_author=Author.objects.get(author__username='Bob'), news_title='Latest news', news_text='Stay updated', news_type_choice='nw')
+
+# Присваиваем категории постам
+Post.objects.get(id=1).category.add(Category.objects.get(category_name='Fantasy'), Category.objects.get(category_name='Mystery'))
+Post.objects.get(id=2).category.add(Category.objects.get(category_name='Sci-Fi'))
+Post.objects.get(id=3).category.add(Category.objects.get(category_name='Romance'), Category.objects.get(category_name='Mystery'))
+
+# Создаем комментарии
+Comment.objects.create(comment_post_connect=Post.objects.get(id=1), comment_user_connect=User.objects.get(username='John'), comment_text='Great story!')
+Comment.objects.create(comment_post_connect=Post.objects.get(id=2), comment_user_connect=User.objects.get(username='Megan'), comment_text='Interesting read.')
+Comment.objects.create(comment_post_connect=Post.objects.get(id=2), comment_user_connect=User.objects.get(username='John'), comment_text='Good insights.')
+Comment.objects.create(comment_post_connect=Post.objects.get(id=3), comment_user_connect=User.objects.get(username='Megan'), comment_text='Thanks for the update.')
+
+# Применяем функции like() и dislike() 
+Post.objects.get(id=1).like()
+Post.objects.get(id=2).dislike()
+Post.objects.get(id=3).like()
+Comment.objects.get(id=1).like()
+Comment.objects.get(id=2).dislike()
+Comment.objects.get(id=3).like()
+Comment.objects.get(id=4).dislike()
+
+# Обновляем рейтинги пользователей
+for author in Author.objects.all(): 
+    author.update_rating()
+
+# Выводим username и рейтинг лучшего пользователя
+best_author = Author.objects.order_by('-author_rating').first()
+print(best_author.author.username, best_author.author_rating)
+
+# Выводим информацию о лучшей статье
+best_post = Post.objects.order_by('-news_rating').first()
+print(best_post.create_time.date(), best_post.post_author.author.username, best_post.news_rating, best_post.news_title, best_post.preview())
+
+# Выводим все комментарии к этой статье
+comments = Comment.objects.filter(comment_post_connect=best_post)
+for comment in comments:
+    print(comment.comment_create_date.date(), comment.comment_user_connect.username, comment.comment_rating, comment.comment_text)
